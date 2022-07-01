@@ -1,9 +1,10 @@
 import falcon
 from datetime import datetime
-from helpers import file_path, render_template
+from helpers import Authorize, file_path, render_template, Authorize
 
+@falcon.before(Authorize())
 class TaskerResource(object):
-    @falcon.before(Authorize())
+    
     @falcon.after(render_template, "index.mako")
     def on_get(self, req, resp):
         """Handles GET requests on index (/)"""

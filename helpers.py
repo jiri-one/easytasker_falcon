@@ -2,6 +2,8 @@
 # import to set current working directory
 from os import path, chdir
 from glob import glob
+import bcrypt
+
 
 # set current working directory
 cwd = path.dirname(path.abspath(__file__))
@@ -12,6 +14,16 @@ def file_path(file_name):
 	"""This function return full absolute path of given file_name, but it works correctly only when the filename is unique in all folders and subfolders!!!"""
 	file_abs_path = path.abspath(glob(f"**/{file_name}", recursive=True)[0])
 	return file_abs_path
+
+# DB helpers
+def get_hashed_password(plain_text_password):
+    # Hash a password for the first time
+    #   (Using bcrypt, the salt is saved into the hash itself)
+    return bcrypt.hashpw(plain_text_password, bcrypt.gensalt())
+
+def check_password(plain_text_password, hashed_password):
+    # Check hashed password. Using bcrypt, the salt is saved into the hash itself
+    return bcrypt.checkpw(plain_text_password, hashed_password)
 
 def render_template(req, resp, resource, template):
 	"""@falcon.after decorator for Mako templates - works on GET and POST methodes"""
