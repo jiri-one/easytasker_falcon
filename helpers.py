@@ -15,7 +15,7 @@ def file_path(file_name):
 	file_abs_path = path.abspath(glob(f"**/{file_name}", recursive=True)[0])
 	return file_abs_path
 
-# DB helpers
+# pasword hash helpers
 def get_hashed_password(plain_text_password):
     # Hash a password for the first time
     #   (Using bcrypt, the salt is saved into the hash itself)

@@ -5,16 +5,21 @@ from pathlib import Path
 from dataclasses import dataclass
 from datetime import datetime
 # internal imports
-from helpers import file_path, get_hashed_password, check_password
+from helpers import get_hashed_password, check_password
+from path_serializer import PathSerializer
 
 # set current working directory
 cwd = Path(__file__).parent
 
 # set DB files and queries
-db_users = TinyDB(cwd / 'db_users.json')
 # db_users.insert({'name': 'USER_NAME', 'password': get_hashed_password("XXXXX")})
 serialization = SerializationMiddleware(JSONStorage)
 serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
+serialization.register_serializer(PathSerializer(), 'TinyPath')
+db = TinyDB(cwd / 'db.json', storage=serialization)
+db_users = TinyDB(cwd / 'db_users.json')
+query = Query()
+
 
 @dataclass
 class Task:
@@ -23,12 +28,46 @@ class Task:
     time_expired: datetime
     time_created: datetime = datetime.now()
     time_finished: datetime = None
-    attachement: Path = None
-    db = TinyDB(cwd / 'db.json', storage=serialization)
-    query = Query()
+    attach: Path = None
+    id: int = None
+
+    def write_to_db(self):
+        self.id = db.insert({ 'title': self.title,
+                    'content': self.content,
+                    'time_expired': self.time_expired,
+                    'time_created': self.time_created,
+                    'time_finished': self.time_finished,
+                    'attach': self.attach,
+                    })
+    
+    def update_in_db(self, id):
+        db.update({ 'title': self.title,
+                    'content': self.content,
+                    'time_expired': self.time_expired,
+                    'time_created': self.time_created,
+                    'time_finished': self.time_finished,
+                    'attach': self.attach,
+                    }, doc_ids=[id])
+    
+
+def get_task_from_db(doc_id):
+    el = db.get(doc_id=doc_id)
+    return Task(title=el["title"],
+                content=el["content"],
+                time_expired=el["time_expired"],
+                time_created=el["time_created"],
+                time_finished=el["time_finished"],
+                attach=el["attach"],
+                id=doc_id
+                )
 
 
-print(Path(__file__).parent)
+def remove_task_from_db(doc_id):
+    db.remove(doc_ids=[doc_id])
+
+
+
+
 print(db_users.search(query.name == 'deso')[0]["password"])
 
 print(check_password("heslo", db_users.search(query.name == 'deso')[0]["password"]))
