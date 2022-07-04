@@ -4,15 +4,14 @@ from tinydb_serialization.serializers import DateTimeSerializer
 from pathlib import Path
 from dataclasses import dataclass
 from datetime import datetime
+import bcrypt
 # internal imports
-from helpers import get_hashed_password, check_password
 from path_serializer import PathSerializer
 
 # set current working directory
 cwd = Path(__file__).parent
 
 # set DB files and queries
-# db_users.insert({'name': 'USER_NAME', 'password': get_hashed_password("XXXXX")})
 serialization = SerializationMiddleware(JSONStorage)
 serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
 serialization.register_serializer(PathSerializer(), 'TinyPath')
@@ -66,7 +65,19 @@ def remove_task_from_db(doc_id):
     db.remove(doc_ids=[doc_id])
 
 
+# pasword hash helpers
+def get_hashed_password(plain_text_password):
+    # Hash a password for the first time
+    #   (Using bcrypt, the salt is saved into the hash itself)
+    return bcrypt.hashpw(plain_text_password, bcrypt.gensalt())
 
+
+def check_password(plain_text_password, hashed_password):
+    # Check hashed password. Using bcrypt, the salt is saved into the hash itself
+    return bcrypt.checkpw(plain_text_password, hashed_password)
+
+
+# db_users.insert({'name': 'USER_NAME', 'password': get_hashed_password("XXXXX")})
 
 print(db_users.search(query.name == 'deso')[0]["password"])
 
