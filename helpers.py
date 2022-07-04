@@ -8,7 +8,7 @@ from falcon import HTTPSeeOther
 # change to current working directory
 chdir(cwd)
 
-# mako settings
+# mako templates settings
 templatelookup = TemplateLookup(directories=['templates'],
                                 module_directory='/tmp/mako_modules',
                                 collection_size=500,
@@ -20,19 +20,8 @@ templatelookup = TemplateLookup(directories=['templates'],
 
 def render_template(req, resp, resource, template):
 	"""@falcon.after decorator for Mako templates - works on GET and POST methodes"""
-	# all_topics = list(topics.order_by("order").run(req.context.conn)) # this line and
-	# resp.text["topics"] = all_topics # this line are here because we need refresh topic everytime, so is best to do in on one place
 	mytemplate = templatelookup.get_template(template)
 	resp.text = mytemplate.render(data=resp.text)
-
-# def create_url(header):
-# 	"""Function for create url adress from header of post."""
-# 	header = unidecode(header).lower() # firstly make all character lower and remove diacritics
-# 	pattern = re.compile(r"\W") # \W means everythink non-alphanumeric
-# 	splited_header = pattern.split(header) # split header with \W
-# 	splited_header = [i for i in splited_header if i] # list comprehension for remove empty strings from list
-# 	url = "-".join(splited_header) # and finaly join the list splited_header with "-"
-# 	return url
 
 
 class Authorize(object):
