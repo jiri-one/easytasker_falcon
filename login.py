@@ -1,8 +1,27 @@
 import falcon
 from uuid import uuid4
 # internal imports
-from helpers import render_template, Authorize
+from helpers import render_template
 from db import cwd, check_password, db_users, query
+
+
+class Authorize(object):
+    """@falcon.before decorator for authorize if successful login - works on GET and POST methodes"""
+
+    def __call__(self, req, resp, resource, params):
+        resp.context.authorized = 0
+        if req.get_cookie_values('cookie_uuid') and req.get_cookie_values('user'):
+            cookie_uuid = req.get_cookie_values('cookie_uuid')[0]
+            user = req.get_cookie_values('user')[0]
+            cookie_from_db = db_users.search(query.name == user)[
+                0]["cookie_uuid"]
+            if cookie_uuid == cookie_from_db:
+                resp.context.authorized = 1
+        else:
+            resp.unset_cookie('cookie_uuid')  # only for sure
+            resp.unset_cookie('user')
+            if req.relative_uri != "/login":
+                raise falcon.HTTPSeeOther("/login")
 
 class LoginResource(object):
     @falcon.before(Authorize())

@@ -47,22 +47,35 @@ class Task:
                     'time_finished': self.time_finished,
                     'attach': self.attach,
                     }, doc_ids=[id])
-    
 
-def get_task_from_db(doc_id):
-    el = db.get(doc_id=doc_id)
+
+def create_task_class(el):
     return Task(title=el["title"],
                 content=el["content"],
                 time_expired=el["time_expired"],
                 time_created=el["time_created"],
                 time_finished=el["time_finished"],
                 attach=el["attach"],
-                id=doc_id
+                id=el.doc_id
                 )
 
+def get_task_from_db(doc_id):
+    el = db.get(doc_id=doc_id)
+    return create_task_class(el)
 
 def remove_task_from_db(doc_id):
     db.remove(doc_ids=[doc_id])
+
+
+def get_tasks(expired=None, finished=None):
+    if expired:
+        for el in db.search(query.time_expired > datetime.now()):
+            yield create_task_class(el)
+    if finished:
+        for el in db.search(query.time_finished != None):
+            yield create_task_class(el)
+    for el in db.all():
+        yield create_task_class(el)
 
 
 # pasword hash helpers
