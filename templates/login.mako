@@ -1,11 +1,4 @@
-<div style="margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
-  -ms-transform: translateX(-50%);
-  transform: translateX(-50%);">
+<center>
 <div class="comment_title"><b>Přihlaste se prosím:</b></div>
 <div class="comment_form">
 <form method="post" action="" accept-charset="UTF-8">
@@ -27,4 +20,4 @@ if (x.type === "password") {
 }
 }
 </script>
-</div>
+</center>
