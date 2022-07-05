@@ -1,9 +1,13 @@
 import falcon
 from datetime import datetime
+from locale import setlocale, LC_TIME
 # internal imports
 from helpers import render_template
 from login import LoginResource, Authorize
 from db import cwd, get_tasks, get_task_from_db
+
+# set global local to czech version of time (I am using english everywhere ...)
+setlocale(LC_TIME, "cs_CZ.utf8")
 
 
 @falcon.before(Authorize())
@@ -19,13 +23,8 @@ class TaskerResource(object):
             case _:
                 tasks = get_tasks()
         resp.text = {"tasks": tasks}
-        # start, end = slice_posts(1) # number one is here hardcoded, because index is always page one
-        # index_posts = list(posts.order_by(r.desc("when")).slice(start, end).run(req.context.conn)) # get index post (page 1) from RethinkDB
-        # posts_count = posts.count().run(req.context.conn) # get number of all posts
-        # page_count = ceil(posts_count / posts_per_page) # get number of pages
-        # pages = list(range(1,page_count+1))	# list of all pages
-        # resp.text = {"posts": index_posts, "pages": pages} # sending data to make tepmplate in resp.text
-    
+
+
     @falcon.after(render_template, "task.mako")
     def on_get_task(self, req, resp, task_id):
         resp.text = get_task_from_db(task_id)

@@ -13,7 +13,7 @@ templatelookup = TemplateLookup(directories=['templates'],
                                 collection_size=500,
                                 output_encoding='utf-8',
                                 encoding_errors='replace',
-                                # imports=['from mako_imports import mako_imp']
+                                imports=['from datetime import datetime']
                                 )
 
 
