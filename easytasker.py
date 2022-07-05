@@ -15,13 +15,7 @@ class TaskerResource(object):
     @falcon.after(render_template, "index.mako")
     def on_get(self, req, resp):
         """Handles GET requests on index (/)"""
-        match req.get_param("tasks"):
-            case "finished":
-                tasks = get_tasks(finished=True)
-            case "expired":
-                tasks = get_tasks(expired=True)
-            case _:
-                tasks = get_tasks()
+        tasks = get_tasks(req.get_param("tasks"))
         resp.text = {"tasks": tasks}
 
 

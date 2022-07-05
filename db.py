@@ -69,11 +69,11 @@ def remove_task_from_db(doc_id):
     db.remove(doc_ids=[doc_id])
 
 
-def get_tasks(expired=None, finished=None):
-    if expired:
+def get_tasks(tasks):
+    if tasks == "expired":
         for el in db.search(query.time_expired < datetime.now()):
             yield create_task_class(el)
-    elif finished:
+    elif tasks == "finished":
         for el in db.search(query.time_finished != None):
             yield create_task_class(el)
     else:
