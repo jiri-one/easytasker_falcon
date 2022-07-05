@@ -1,9 +1,11 @@
+from xml.dom.minidom import Document
 from tinydb import TinyDB, Query, JSONStorage
+from tinydb.table import Document
 from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization.serializers import DateTimeSerializer
 from pathlib import Path
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 import bcrypt
 # internal imports
 from path_serializer import PathSerializer
@@ -39,14 +41,14 @@ class Task:
                     'attach': self.attach,
                     })
     
-    def update_in_db(self, id):
+    def update_in_db(self):
         db.update({ 'title': self.title,
                     'content': self.content,
                     'time_expired': self.time_expired,
                     'time_created': self.time_created,
                     'time_finished': self.time_finished,
                     'attach': self.attach,
-                    }, doc_ids=[id])
+                    }, doc_ids=[self.id])
 
 
 def create_task_class(el):
@@ -69,13 +71,14 @@ def remove_task_from_db(doc_id):
 
 def get_tasks(expired=None, finished=None):
     if expired:
-        for el in db.search(query.time_expired > datetime.now()):
+        for el in db.search(query.time_expired < datetime.now()):
             yield create_task_class(el)
-    if finished:
+    elif finished:
         for el in db.search(query.time_finished != None):
             yield create_task_class(el)
-    for el in db.all():
-        yield create_task_class(el)
+    else:
+        for el in db.search(query.time_expired > datetime.now()):
+            yield create_task_class(el)
 
 
 # pasword hash helpers

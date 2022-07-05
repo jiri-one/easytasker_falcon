@@ -11,7 +11,13 @@ class TaskerResource(object):
     @falcon.after(render_template, "index.mako")
     def on_get(self, req, resp):
         """Handles GET requests on index (/)"""
-        tasks = get_tasks()
+        match req.get_param("tasks"):
+            case "finished":
+                tasks = get_tasks(finished=True)
+            case "expired":
+                tasks = get_tasks(expired=True)
+            case _:
+                tasks = get_tasks()
         resp.text = {"tasks": tasks}
         # start, end = slice_posts(1) # number one is here hardcoded, because index is always page one
         # index_posts = list(posts.order_by(r.desc("when")).slice(start, end).run(req.context.conn)) # get index post (page 1) from RethinkDB
