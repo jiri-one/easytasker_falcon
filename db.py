@@ -40,6 +40,7 @@ class Task:
                     'time_finished': self.time_finished,
                     'attach': self.attach,
                     })
+        return self.id
     
     def update_in_db(self):
         db.update({ 'title': self.title,

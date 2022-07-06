@@ -6,7 +6,7 @@
     ##  % endif
     <div class="titulek"><a href="/${task.id}">${task.title}</a></div>
     <div class="obsah">${task.content}</div>
-    <div class="time_created">${task.time_created}</div>
-    <div class="time_expired">${task.time_expired}</div>
+    <div class="time_created">${task.time_created.strftime('%c')}</div>
+    <div class="time_expired">${task.time_expired.strftime('%c')}</div>
      <div class="postend">• • •</div>
 % endfor

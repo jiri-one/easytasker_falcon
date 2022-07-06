@@ -4,7 +4,7 @@ from locale import setlocale, LC_TIME
 # internal imports
 from helpers import render_template
 from login import LoginResource, Authorize
-from db import cwd, get_tasks, get_task_from_db
+from db import cwd, get_tasks, get_task_from_db, Task
 
 # set global local to czech version of time (I am using english everywhere ...)
 setlocale(LC_TIME, "cs_CZ.utf8")
@@ -22,6 +22,59 @@ class TaskerResource(object):
     @falcon.after(render_template, "task.mako")
     def on_get_task(self, req, resp, task_id):
         resp.text = get_task_from_db(task_id)
+    
+    
+    @falcon.after(render_template, "new_task.mako")
+    def on_get_new_task(self, req, resp):
+        resp.text = {}
+    
+    def on_post_new_task(self, req, resp):
+        form = req.get_media()
+        print(form)
+        task_data = {}
+        for part in form:
+            if part.name == 'filename':
+                # here will be best to check if the file exists already
+                with open(cwd / f"files/{part.filename}", "wb") as dest:
+                    while True:
+                        chunk = part.stream.read(4096)
+                        if not chunk:
+                            break
+                        dest.write(chunk)
+                task_data["attach"] = cwd / f"files/{part.filename}"
+            
+            else:
+                task_data[part.name] = part.data.decode()
+        print(task_data)
+
+        new_task = Task(title=task_data["task_title"],
+                        content=task_data["task_content"],
+                        time_expired=datetime.fromisoformat(task_data["time_expired"]),
+                        attach=task_data.get("attach"),
+                        )
+        new_task.write_to_db()
+        raise falcon.HTTPSeeOther(f"/{new_task.id}")
+    
+    
+    @falcon.after(render_template, "upload.mako")
+    def on_get_upload(self, req, resp):
+        """Handles GET requests (/upload)"""
+        resp.text = {}
+
+    
+    @falcon.after(render_template, "upload.mako")
+    def on_post_upload(self, req, resp):
+        """Handles POST requests (/upload)"""
+        form = req.get_media()
+        for part in form:
+            if part.name == 'filename':
+                with open(cwd / f"files/{part.filename}", "wb") as dest:
+                    while True:
+                        chunk = part.stream.read(4096)
+                        if not chunk:
+                            break
+                        dest.write(chunk)
+            resp.text = {"link": part.filename}
 
 
 # falcon.API instances are callable WSGI apps
@@ -34,10 +87,12 @@ app.add_static_route("/files", cwd / "files", downloadable=True, fallback_filena
 # Resources are represented by long-lived class instances
 easytasker = TaskerResource()
 login = LoginResource()
-app.add_route('/', easytasker)
 app.add_route('/login', login)
 app.add_route('/logout', login, suffix="logout")
+app.add_route('/', easytasker)
 app.add_route('/{task_id:int}', easytasker, suffix="task")
+app.add_route('/new_task', easytasker, suffix="new_task")
+app.add_route('/upload', easytasker, suffix="upload")
 
 
 # the rest of code is not needed for server purposes
