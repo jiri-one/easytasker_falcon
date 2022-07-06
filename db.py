@@ -40,7 +40,6 @@ class Task:
                     'time_finished': self.time_finished,
                     'attach': self.attach,
                     })
-        return self.id
     
     def update_in_db(self):
         db.update({ 'title': self.title,
@@ -93,9 +92,7 @@ def check_password(plain_text_password, hashed_password):
     # Check hashed password. Using bcrypt, the salt is saved into the hash itself
     return bcrypt.checkpw(plain_text_password, hashed_password)
 
-
+# some commands for test
 # db_users.insert({'name': 'USER_NAME', 'password': get_hashed_password("XXXXX")})
-
-print(db_users.search(query.name == 'deso')[0]["password"])
-
-print(check_password("heslo", db_users.search(query.name == 'deso')[0]["password"]))
+# print(db_users.search(query.name == 'deso')[0]["password"])
+# print(check_password("heslo", db_users.search(query.name == 'deso')[0]["password"]))

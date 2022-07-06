@@ -30,7 +30,6 @@ class TaskerResource(object):
     
     def on_post_new_task(self, req, resp):
         form = req.get_media()
-        print(form)
         task_data = {}
         for part in form:
             if part.name == 'filename':
