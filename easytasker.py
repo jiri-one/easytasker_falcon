@@ -45,7 +45,6 @@ class TaskerResource(object):
             
             else:
                 task_data[part.name] = part.data.decode()
-        print(task_data)
 
         new_task = Task(title=task_data["task_title"],
                         content=task_data["task_content"],
@@ -55,27 +54,6 @@ class TaskerResource(object):
         new_task.write_to_db()
         raise falcon.HTTPSeeOther(f"/{new_task.id}")
     
-    
-    @falcon.after(render_template, "upload.mako")
-    def on_get_upload(self, req, resp):
-        """Handles GET requests (/upload)"""
-        resp.text = {}
-
-    
-    @falcon.after(render_template, "upload.mako")
-    def on_post_upload(self, req, resp):
-        """Handles POST requests (/upload)"""
-        form = req.get_media()
-        for part in form:
-            if part.name == 'filename':
-                with open(cwd / f"files/{part.filename}", "wb") as dest:
-                    while True:
-                        chunk = part.stream.read(4096)
-                        if not chunk:
-                            break
-                        dest.write(chunk)
-            resp.text = {"link": part.filename}
-
 
 # falcon.API instances are callable WSGI apps
 app = falcon.App(media_type=falcon.MEDIA_HTML)
