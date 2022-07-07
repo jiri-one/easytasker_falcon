@@ -1,10 +1,9 @@
 from tinydb import TinyDB, Query, JSONStorage
-from tinydb.table import Document
 from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization.serializers import DateTimeSerializer
 from pathlib import Path
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 import bcrypt
 # internal imports
 from path_serializer import PathSerializer
@@ -16,10 +15,13 @@ cwd = Path(__file__).parent
 serialization = SerializationMiddleware(JSONStorage)
 serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
 serialization.register_serializer(PathSerializer(), 'TinyPath')
-db = TinyDB(cwd / 'db.json', storage=serialization)
-db_users = TinyDB(cwd / 'db_users.json')
+db_users = TinyDB(cwd / 'files/db_users.json')
 query = Query()
 
+
+def db_init(user):
+    """Importat function for initiating db for every user."""
+    return TinyDB(cwd / f'files/{user}/db.json', storage=serialization)
 
 @dataclass
 class Task:
@@ -30,9 +32,10 @@ class Task:
     time_finished: datetime = None
     attach: Path = None
     id: int = None
+    db: TinyDB = None
 
     def write_to_db(self):
-        self.id = db.insert({ 'title': self.title,
+        self.id = self.db.insert({ 'title': self.title,
                     'content': self.content,
                     'time_expired': self.time_expired,
                     'time_created': self.time_created,
@@ -41,7 +44,7 @@ class Task:
                     })
     
     def update_in_db(self):
-        db.update({ 'title': self.title,
+        self.db.update({ 'title': self.title,
                     'content': self.content,
                     'time_expired': self.time_expired,
                     'time_created': self.time_created,
@@ -60,25 +63,23 @@ def create_task_class(el):
                 id=el.doc_id
                 )
 
-def get_task_from_db(doc_id):
+def get_task_from_db(db, doc_id):
     el = db.get(doc_id=doc_id)
     return create_task_class(el)
 
-def remove_task_from_db(doc_id):
+def remove_task_from_db(db, doc_id):
     db.remove(doc_ids=[doc_id])
 
 
-def get_tasks(tasks):
+def get_tasks(db, tasks):
     if tasks == "expired":
-        for el in db.search(query.time_expired < datetime.now()):
-            yield create_task_class(el)
+        result = db.search(query.time_expired < datetime.now())
     elif tasks == "finished":
-        for el in db.search(query.time_finished != None):
-            yield create_task_class(el)
+        result = db.search(query.time_finished != None)
     else:
-        for el in db.search(query.time_expired > datetime.now()):
-            yield create_task_class(el)
-
+        result = db.search(query.time_expired > datetime.now())
+    for el in sorted(result, key=lambda k: k['time_created'], reverse=True):
+        yield create_task_class(el)
 
 # user, pasword and hash helpers
 def get_hashed_password(plain_text_password):
@@ -100,8 +101,6 @@ def register_user(user, passwd):
         return new_user_id
     else:
         raise ValueError("Database error! Contact administrator.")
-
-    
 
 
 # some commands for test

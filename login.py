@@ -1,8 +1,9 @@
 import falcon
 from uuid import uuid4
+from os import mkdir
 # internal imports
 from helpers import render_template
-from db import cwd, check_password, db_users, query, register_user
+from db import cwd, check_password, db_users, query, register_user, db_init
 
 
 class Authorize(object):
@@ -17,6 +18,8 @@ class Authorize(object):
                 0]["cookie_uuid"]
             if cookie_uuid == cookie_from_db:
                 resp.context.authorized = 1
+                resource.user = user
+                resource.db = db_init(user)
         else:
             resp.unset_cookie('cookie_uuid')  # only for sure
             resp.unset_cookie('user')
@@ -35,18 +38,19 @@ class LoginResource(object):
     def on_post(self, req, resp):
         login = req.get_param("login")
         passwd = req.get_param("password")
-        if check_password(passwd, db_users.search(query.name == login)[0]["password"]):
-            new_cookie = str(uuid4())
-            db_users.update({'cookie_uuid': new_cookie}, query.name == login)
-            resp.set_cookie('cookie_uuid', new_cookie,
-                            max_age=72000, secure=True)
-            resp.set_cookie('user', login,
-                            max_age=72000, secure=True)
-            raise falcon.HTTPSeeOther("/")
-        else:
-            raise falcon.HTTPUnauthorized(
-                title="Bad login or password! (Špatné jméno nebo heslo!)")
-
+        try:
+            if check_password(passwd, db_users.search(query.name == login)[0]["password"]):
+                new_cookie = str(uuid4())
+                db_users.update({'cookie_uuid': new_cookie}, query.name == login)
+                resp.set_cookie('cookie_uuid', new_cookie,
+                                max_age=72000, secure=True)
+                resp.set_cookie('user', login,
+                                max_age=72000, secure=True)
+                raise falcon.HTTPSeeOther("/")
+            else:
+                raise falcon.HTTPUnauthorized("Bad login or password! (Špatné jméno nebo heslo!)")
+        except IndexError:
+            raise falcon.HTTPUnauthorized("Vaše jméno nebo heslo zřejmě není vůbec v databázi, registrujte se prosím.")
     
     def on_get_logout(self, req, resp):
         resp.unset_cookie('cookie_uuid')
@@ -67,8 +71,11 @@ class LoginResource(object):
         passwd = req.get_param("password")
         try:
             new_user_id = register_user(login, passwd)
+            mkdir(cwd / f"files/{login}")
         except ValueError as e:
             resp.text = {"error": e}
+        except FileExistsError as e:
+            resp.text = {"error": "Adresář s tímto uživatelským jménem už existuje, zvolte si jiné."}
         else:
             raise falcon.HTTPStatus('202 Accepted', text=f'Registrace proběhla úspěšně. Byl registrován uživatel s ID {new_user_id} a uživatelským jménem {login}. Pokračujte na <a href="/login">přihlašovací stránku</a>.')
 

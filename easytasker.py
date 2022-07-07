@@ -12,16 +12,17 @@ setlocale(LC_TIME, "cs_CZ.utf8")
 
 @falcon.before(Authorize())
 class TaskerResource(object):
+   
     @falcon.after(render_template, "index.mako")
     def on_get(self, req, resp):
         """Handles GET requests on index (/)"""
-        tasks = get_tasks(req.get_param("tasks"))
+        tasks = get_tasks(self.db, req.get_param("tasks"))
         resp.text = {"tasks": tasks}
 
 
     @falcon.after(render_template, "task.mako")
     def on_get_task(self, req, resp, task_id):
-        resp.text = get_task_from_db(task_id)
+        resp.text = get_task_from_db(self.db, task_id)
     
     
     @falcon.after(render_template, "new_task.mako")
@@ -32,15 +33,15 @@ class TaskerResource(object):
         form = req.get_media()
         task_data = {}
         for part in form:
-            if part.name == 'filename':
+            if part.name == 'filename' and part.data:
                 # here will be best to check if the file exists already
-                with open(cwd / f"files/{part.filename}", "wb") as dest:
+                with open(cwd / f"files/{self.user}/{part.filename}", "wb") as dest:
                     while True:
-                        chunk = part.stream.read(4096)
+                        chunk = part.stream.read(1024)
                         if not chunk:
                             break
                         dest.write(chunk)
-                task_data["attach"] = cwd / f"files/{part.filename}"
+                task_data["attach"] = cwd / f"files/{self.user}/{part.filename}"
             
             else:
                 task_data[part.name] = part.data.decode()
@@ -49,6 +50,7 @@ class TaskerResource(object):
                         content=task_data["task_content"],
                         time_expired=datetime.fromisoformat(task_data["time_expired"]),
                         attach=task_data.get("attach"),
+                        db=self.db,
                         )
         new_task.write_to_db()
         raise falcon.HTTPSeeOther(f"/{new_task.id}")

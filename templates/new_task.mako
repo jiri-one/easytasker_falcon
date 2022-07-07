@@ -17,7 +17,7 @@
 	"buttons": "source,,,,,,,brush,|,ul,ol,|,outdent,indent,|,|,image,file,video,table,link,,align,undo,redo,\n,selectall,cut,copy,paste,copyformat,|,hr,symbol,fullsize,print,preview,find"
 	});</script>
     <label for="time_expired">Čas, do kdy má být úkol hotov:</label>
-	<input type="datetime-local" id="time_expired" name="time_expired"><br>
+	<input type="datetime-local" id="time_expired" required="required" name="time_expired"><br>
     <label for="filename">Vyberte soubor, který chcete uploadovat s úkolem.</label>
     <input type="file" id="myFile" name="filename"><br><br>
 	<input type="submit" name="public" value="Uložit">
