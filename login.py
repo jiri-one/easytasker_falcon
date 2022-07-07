@@ -36,8 +36,13 @@ class LoginResource(object):
             resp.text = {}
     
     def on_post(self, req, resp):
-        login = req.get_param("login")
-        passwd = req.get_param("password")
+        form_data = {}
+        for part in req.media:
+            form_data[part.name] = part.data.decode()
+
+        login = form_data["login"]
+        passwd = form_data["password"]
+        print(login, passwd)
         try:
             if check_password(passwd, db_users.search(query.name == login)[0]["password"]):
                 new_cookie = str(uuid4())
@@ -49,7 +54,7 @@ class LoginResource(object):
                 raise falcon.HTTPSeeOther("/")
             else:
                 raise falcon.HTTPUnauthorized("Bad login or password! (Špatné jméno nebo heslo!)")
-        except IndexError:
+        except IndexError as e:
             raise falcon.HTTPUnauthorized("Vaše jméno nebo heslo zřejmě není vůbec v databázi, registrujte se prosím.")
     
     def on_get_logout(self, req, resp):

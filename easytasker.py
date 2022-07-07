@@ -30,17 +30,12 @@ class TaskerResource(object):
         resp.text = {}
     
     def on_post_new_task(self, req, resp):
-        form = req.get_media()
         task_data = {}
-        for part in form:
+        for part in req.media:
             if part.name == 'filename' and part.data:
                 # here will be best to check if the file exists already
                 with open(cwd / f"files/{self.user}/{part.filename}", "wb") as dest:
-                    while True:
-                        chunk = part.stream.read(1024)
-                        if not chunk:
-                            break
-                        dest.write(chunk)
+                    dest.write(part.data) # better with chunks here, but chunks work only if if form is only file, not other data
                 task_data["attach"] = cwd / f"files/{self.user}/{part.filename}"
             
             else:
@@ -58,7 +53,6 @@ class TaskerResource(object):
 
 # falcon.API instances are callable WSGI apps
 app = falcon.App(media_type=falcon.MEDIA_HTML)
-app.req_options.auto_parse_form_urlencoded = True # that needed because of forms
 app.add_static_route("/templates", cwd / "templates", downloadable=True, fallback_filename=None)
 app.add_static_route("/files", cwd / "files", downloadable=True, fallback_filename=None)
 
