@@ -69,6 +69,7 @@ app.add_route('/logout', login, suffix="logout")
 app.add_route('/', easytasker)
 app.add_route('/{task_id:int}', easytasker, suffix="task")
 app.add_route('/new_task', easytasker, suffix="new_task")
+app.add_route('/register', login, suffix="register")
 
 
 # the rest of code is not needed for server purposes

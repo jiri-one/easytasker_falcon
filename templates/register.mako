@@ -1,5 +1,8 @@
-<center>
-<div class="comment_title"><b>Přihlaste se prosím:</b></div>
+% if "error" in data:
+    Při zobrazení stánky nastal tento problém: ${data["error"]}
+% else: # this is the default view
+    <center>
+<div class="comment_title"><b>Registrace nového uživatele:</b></div>
 <div class="comment_form">
 <form method="post" action="" accept-charset="UTF-8">
 	<label for="login">Uživatelské jméno:</label><br>
@@ -10,7 +13,6 @@
 	<input type="submit" value="Odeslat">
 </form>
 </div>
-<div class="comment_title"><b>Pokud nejste registrováni, můžete tak učinit <a href="/register">ZDE</a></b></div>
 <script>
 function showPassword() {
 var x = document.getElementsByName("password")[0];
@@ -22,3 +24,5 @@ if (x.type === "password") {
 }
 </script>
 </center>
+
+% endif

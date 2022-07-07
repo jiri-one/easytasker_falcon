@@ -2,7 +2,7 @@ import falcon
 from uuid import uuid4
 # internal imports
 from helpers import render_template
-from db import cwd, check_password, db_users, query
+from db import cwd, check_password, db_users, query, register_user
 
 
 class Authorize(object):
@@ -52,3 +52,29 @@ class LoginResource(object):
         resp.unset_cookie('cookie_uuid')
         resp.unset_cookie('user')
         raise falcon.HTTPSeeOther("/login")
+
+
+    @falcon.after(render_template, "register.mako")
+    def on_get_register(self, req, resp):
+        if req.get_cookie_values('cookie_uuid') and req.get_cookie_values('user'):
+            resp.text = {"error": """Přihlášení uživatelé nemohou provádět registrace! Musíte se nejdříve <a href="/logout">odhlásit.</a>"""}
+        else:
+            resp.text = {}
+    
+    @falcon.after(render_template, "register.mako")
+    def on_post_register(self, req, resp):
+        login = req.get_param("login")
+        passwd = req.get_param("password")
+        try:
+            new_user_id = register_user(login, passwd)
+        except ValueError as e:
+            resp.text = {"error": e}
+        else:
+            raise falcon.HTTPStatus('202 Accepted', text=f'Registrace proběhla úspěšně. Byl registrován uživatel s ID {new_user_id} a uživatelským jménem {login}. Pokračujte na <a href="/login">přihlašovací stránku</a>.')
+
+
+
+
+    
+
+    

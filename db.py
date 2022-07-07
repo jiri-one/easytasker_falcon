@@ -1,4 +1,3 @@
-from xml.dom.minidom import Document
 from tinydb import TinyDB, Query, JSONStorage
 from tinydb.table import Document
 from tinydb_serialization import SerializationMiddleware
@@ -81,7 +80,7 @@ def get_tasks(tasks):
             yield create_task_class(el)
 
 
-# pasword hash helpers
+# user, pasword and hash helpers
 def get_hashed_password(plain_text_password):
     # Hash a password for the first time
     #   (Using bcrypt, the salt is saved into the hash itself)
@@ -91,6 +90,19 @@ def get_hashed_password(plain_text_password):
 def check_password(plain_text_password, hashed_password):
     # Check hashed password. Using bcrypt, the salt is saved into the hash itself
     return bcrypt.checkpw(plain_text_password, hashed_password)
+
+
+def register_user(user, passwd):
+    if len(db_users.search(query.name == user)) != 0: # username is taken
+        raise ValueError("Username is taken! Choose another.")
+    new_user_id = db_users.insert({'name': user, 'password': get_hashed_password(passwd)})
+    if new_user_id:
+        return new_user_id
+    else:
+        raise ValueError("Database error! Contact administrator.")
+
+    
+
 
 # some commands for test
 # db_users.insert({'name': 'USER_NAME', 'password': get_hashed_password("XXXXX")})
