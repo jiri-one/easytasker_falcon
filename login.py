@@ -42,7 +42,6 @@ class LoginResource(object):
 
         login = form_data["login"]
         passwd = form_data["password"]
-        print(login, passwd)
         try:
             if check_password(passwd, db_users.search(query.name == login)[0]["password"]):
                 new_cookie = str(uuid4())
