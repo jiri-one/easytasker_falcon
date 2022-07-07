@@ -20,6 +20,11 @@ class Authorize(object):
                 resp.context.authorized = 1
                 resource.user = user
                 resource.db = db_init(user)
+            else:
+                resp.unset_cookie('cookie_uuid')  # only for sure
+                resp.unset_cookie('user')
+                if req.relative_uri != "/login":
+                    raise falcon.HTTPSeeOther("/login")
         else:
             resp.unset_cookie('cookie_uuid')  # only for sure
             resp.unset_cookie('user')

@@ -2,7 +2,7 @@
 
 <div class="task_title">Nový úkol:</div><hr>
 <div class="task_form">
-<form method="post" action="" accept-charset="UTF-8" enctype="multipart/form-data">
+<form method="post" action="/new_task" accept-charset="UTF-8" enctype="multipart/form-data">
 	<br><br><label for="task_title">Titulek:</label><br>
 	<input type="text" required="required" name="task_title" placeholder="Jméno úkolu.." style="width:100%;"><br>
 	
@@ -19,7 +19,7 @@
     <label for="time_expired">Čas, do kdy má být úkol hotov:</label>
 	<input type="datetime-local" id="time_expired" required="required" name="time_expired"><br>
     <label for="filename">Vyberte soubor, který chcete uploadovat s úkolem.</label>
-    <input type="file" id="myFile" name="filename"><br><br>
+    <input type="file" name="filename"><br><br>
 	<input type="submit" name="public" value="Uložit">
 </form>
 </div>
