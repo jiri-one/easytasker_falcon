@@ -79,7 +79,8 @@ def get_tasks(db, tasks):
     elif tasks == "finished":
         result = db.search(query.time_finished != None)
     else:
-        result = db.search(query.time_expired > datetime.now())
+        result = db.search(query.time_expired > datetime.now()
+                           and query.time_finished == None)
     for el in sorted(result, key=lambda k: k['time_created'], reverse=True):
         yield create_task_class(el)
 
