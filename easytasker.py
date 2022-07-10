@@ -5,7 +5,7 @@ from locale import setlocale, LC_TIME
 # internal imports
 from helpers import render_template
 from login import LoginResource, Authorize
-from db import cwd, get_tasks, get_task_from_db, Task
+from db import cwd, get_tasks, get_task_from_db, remove_task_from_db, Task
 
 # set global local to czech version of time (I am using english everywhere ...)
 setlocale(LC_TIME, "cs_CZ.utf8")
@@ -22,21 +22,39 @@ class TaskerResource(object):
     
     def on_post(self, req, resp):
         """Handles POST requests on index (/)"""
-        for part in req.media:
-            try:
-                doc_id = int(part.split("_")[1])
-            except ValueError:
-                falcon.HTTPBadRequest("Používejte pouze tlačítka a odkazy na stránce!")
-            task = get_task_from_db(self.db, doc_id)
-            task.time_finished = datetime.now()
-            task.update_in_db()
-        raise falcon.HTTPSeeOther("/?tasks=finished")
-
+        if req.get_param("tasks") != "finished":
+            for part in req.media:
+                try:
+                    doc_id = int(part.split("_")[1])
+                    if part.split("_")[0] != "finished":
+                        raise ValueError
+                except ValueError:
+                    falcon.HTTPBadRequest("Používejte pouze tlačítka a odkazy na stránce!")
+                task = get_task_from_db(self.db, doc_id)
+                task.time_finished = datetime.now()
+                task.update_in_db()
+            raise falcon.HTTPSeeOther("/?tasks=finished")
+        else:
+            falcon.HTTPBadRequest("Používejte pouze tlačítka a odkazy na stránce!")
+    
 
     @falcon.after(render_template, "task.mako")
     def on_get_task(self, req, resp, task_id):
         resp.text = get_task_from_db(self.db, task_id)
     
+    
+    def on_post_task(self, req, resp, task_id):
+        for part in req.media:
+            try:
+                doc_id = int(part.split("_")[1])
+                if part.split("_")[0] != "delete" or doc_id != task_id:
+                    raise ValueError
+            except ValueError:
+                falcon.HTTPBadRequest(
+                    "Používejte pouze tlačítka a odkazy na stránce!")
+        remove_task_from_db(self.db, doc_id)
+        raise falcon.HTTPSeeOther("/")
+
     
     @falcon.after(render_template, "new_task.mako")
     def on_get_new_task(self, req, resp):
