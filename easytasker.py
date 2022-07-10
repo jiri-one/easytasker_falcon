@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 import falcon
 from datetime import datetime
 from locale import setlocale, LC_TIME
@@ -18,6 +19,18 @@ class TaskerResource(object):
         """Handles GET requests on index (/)"""
         tasks = get_tasks(self.db, req.get_param("tasks"))
         resp.text = {"tasks": tasks}
+    
+    def on_post(self, req, resp):
+        """Handles POST requests on index (/)"""
+        for part in req.media:
+            try:
+                doc_id = int(part.split("_")[1])
+            except ValueError:
+                falcon.HTTPBadRequest("Používejte pouze tlačítka a odkazy na stránce!")
+            task = get_task_from_db(self.db, doc_id)
+            task.time_finished = datetime.now()
+            task.update_in_db()
+        raise falcon.HTTPSeeOther("/?tasks=finished")
 
 
     @falcon.after(render_template, "task.mako")
@@ -32,7 +45,7 @@ class TaskerResource(object):
     def on_post_new_task(self, req, resp):
         task_data = {}
         for part in req.media:
-            if part.name == 'filename' and part.filename:
+            if part.name == 'filename' and part.filenamegi:
                 # here will be best to check if the file exists already
                 with open(cwd / f"files/{self.user}/{part.filename}", "wb") as dest:
                     #dest.write(part.data) if you want to upload it whole

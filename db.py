@@ -65,7 +65,9 @@ def create_task_class(el):
 
 def get_task_from_db(db, doc_id):
     el = db.get(doc_id=doc_id)
-    return create_task_class(el)
+    task = create_task_class(el)
+    task.db = db
+    return task
 
 def remove_task_from_db(db, doc_id):
     db.remove(doc_ids=[doc_id])
