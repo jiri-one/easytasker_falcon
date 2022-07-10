@@ -75,12 +75,13 @@ def remove_task_from_db(db, doc_id):
 
 def get_tasks(db, tasks):
     if tasks == "expired":
-        result = db.search(query.time_expired < datetime.now())
+        result = db.search( (query.time_expired < datetime.now()) &
+                            (query.time_finished == None))
     elif tasks == "finished":
         result = db.search(query.time_finished != None)
     else:
-        result = db.search(query.time_expired > datetime.now()
-                           and query.time_finished == None)
+        result = db.search( (query.time_expired > datetime.now()) &
+                            (query.time_finished == None))
     for el in sorted(result, key=lambda k: k['time_created'], reverse=True):
         yield create_task_class(el)
 
