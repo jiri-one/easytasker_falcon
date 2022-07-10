@@ -46,27 +46,26 @@ body {
   color: black;
 }
 
-/* Create three equal tasks that floats next to each other */
-/* Create three equal columns that float next to each other */
 .task {
-  float: left;
-  width: 33.33%;
+  width: 100%;
+  border: 1px solid black;
+  padding: 15px;
+  border-spacing: 30px;
 }
 
-/* Clear floats after the columns */
-.column:after {
-  content: "";
-  display: table;
-  clear: both;
+.title {
+  border: 10px solid white;
+  background: #3399ff;
+  padding: 15px;
 }
 
-/* Responsive layout - makes the three columns stack on top of each other instead of next to each other on smaller screens (600px wide or less) */
-@media screen and (max-width: 600px) {
-  .task {
-    width: 100%;
-  }
+.content, .time_created, .time_expired {
+  padding-left: 15px;
 }
 
+a:link, .title a:visited {
+  color: #000000;
+}
 </style>
 </head>
 <body>

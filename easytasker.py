@@ -32,7 +32,7 @@ class TaskerResource(object):
     def on_post_new_task(self, req, resp):
         task_data = {}
         for part in req.media:
-            if part.name == 'filename':
+            if part.name == 'filename' and part.filename:
                 # here will be best to check if the file exists already
                 with open(cwd / f"files/{self.user}/{part.filename}", "wb") as dest:
                     #dest.write(part.data) if you want to upload it whole

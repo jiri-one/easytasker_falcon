@@ -1,10 +1,10 @@
 <%inherit file="base.mako"/>
 
-<div class="task_title">Nový úkol:</div><hr>
-<div class="task_form">
+<div class="title" style="text-align:center;"><b>Nový úkol (task):</b></div>
+<div class="task_form" style="padding-left:15px;padding-right:15px;padding-bottom:15px;">
 <form method="post" action="/new_task" accept-charset="UTF-8" enctype="multipart/form-data">
-	<br><br><label for="task_title">Titulek:</label><br>
-	<input type="text" required="required" name="task_title" placeholder="Jméno úkolu.." style="width:100%;"><br>
+	<label for="task_title">Titulek:</label><br>
+	<input type="text" required="required" name="task_title" placeholder="Jméno úkolu.." style="width:100%;">
 	
 	<label for="task_content">Text/zadání úkolu:</label><br>
 	
