@@ -3,14 +3,16 @@
 % for task in data["tasks"]:
     <div class="task">
     <div class="title"><a href="/${task.id}">${task.title}</a>
-
+    % if data["tasks_type"] != "finished":
     <div style="float: right;">
     <form action="" method="post">
     <input type="submit" name="finished_${task.id}" id="finished_${task.id}" value="ÚKOL DOKONČEN" disabled="disabled"/>
 
     <input type="checkbox" onchange="document.getElementById('finished_${task.id}').disabled = !this.checked;" />
 
-    </form></div></div>
+    </form></div>
+    % endif
+    </div>
     <div class="content">${task.content}</div>
     <div class="hr" style="padding-left:15px;padding-right:15px;"><hr></div>
     <div class="time_created">Úkol vytvořen: ${task.time_created.strftime('%c')}</div>

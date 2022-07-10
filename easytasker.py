@@ -18,7 +18,7 @@ class TaskerResource(object):
     def on_get(self, req, resp):
         """Handles GET requests on index (/)"""
         tasks = get_tasks(self.db, req.get_param("tasks"))
-        resp.text = {"tasks": tasks}
+        resp.text = {"tasks": tasks, "tasks_type": req.get_param("tasks")}
     
     def on_post(self, req, resp):
         """Handles POST requests on index (/)"""
