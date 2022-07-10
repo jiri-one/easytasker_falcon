@@ -1,5 +1,13 @@
 <%inherit file="base.mako"/>
-
+<b>Nacházíte se v kategorii: 
+% if data["tasks_type"] == "finished":
+    Dokončené úkoly
+% elif data["tasks_type"] == "expired":
+    Prošlé úkoly
+% else:
+    Aktuální úkoly
+% endif
+<b>
 % for task in data["tasks"]:
     <div class="task">
     <div class="title"><a href="/${task.id}">${task.title}</a>
