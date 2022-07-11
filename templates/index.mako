@@ -7,7 +7,7 @@
 % else:
     Aktuální úkoly
 % endif
-<b>
+</b>
 % for task in data["tasks"]:
     <div class="task">
     <div class="title"><a href="/${task.id}">${task.title}</a>
