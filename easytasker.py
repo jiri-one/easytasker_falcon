@@ -5,7 +5,7 @@ from locale import setlocale, LC_TIME
 # internal imports
 from helpers import render_template
 from login import LoginResource, Authorize
-from db import cwd, get_tasks, get_task_from_db, remove_task_from_db, Task
+from db import cwd, get_tasks, get_task_from_db, remove_task_from_db, search_tasks, Task
 
 # set global local to czech version of time (I am using english everywhere ...)
 setlocale(LC_TIME, "cs_CZ.utf8")
@@ -86,6 +86,25 @@ class TaskerResource(object):
         new_task.write_to_db()
         raise falcon.HTTPSeeOther(f"/{new_task.id}")
     
+    @falcon.after(render_template, "search.mako")
+    def on_get_search(self, req, resp):
+        resp.text = {}
+
+    @falcon.after(render_template, "search.mako")
+    def on_post_search(self, req, resp):
+        for part in req.media:
+            if part.name == "search":
+                searched_word = part.data.decode()
+            else:
+                where_to_search = part.data.decode()
+        tasks = search_tasks(self.db, where_to_search, searched_word)
+        resp.text = {"tasks": tasks,
+                     "tasks_type": where_to_search,
+                     "searched_word": searched_word
+                    }
+        #raise falcon.HTTPSeeOther(req.url)
+
+    
 
 # falcon.API instances are callable WSGI apps
 app = falcon.App(media_type=falcon.MEDIA_HTML)
@@ -98,10 +117,11 @@ easytasker = TaskerResource()
 login = LoginResource()
 app.add_route('/login', login)
 app.add_route('/logout', login, suffix="logout")
+app.add_route('/register', login, suffix="register")
 app.add_route('/', easytasker)
 app.add_route('/{task_id:int}', easytasker, suffix="task")
 app.add_route('/new_task', easytasker, suffix="new_task")
-app.add_route('/register', login, suffix="register")
+app.add_route('/search', easytasker, suffix="search")
 
 
 # the rest of code is not needed for server purposes

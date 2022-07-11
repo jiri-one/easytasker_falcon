@@ -81,6 +81,7 @@ a:link, .title a:visited {
 	<a href="/?tasks=finished">Dokončené úkoly</a>
 	<a href="/?tasks=expired">Prošlé úkoly</a>
 	<a href="/new_task">Nový úkol</a>
+  <a href="/search">Vyhledávání</a>
 	<a href="/logout">Odhlásit se</a>
 </div>
 

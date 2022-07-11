@@ -5,6 +5,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from datetime import datetime
 import bcrypt
+import re
 # internal imports
 from path_serializer import PathSerializer
 
@@ -35,7 +36,8 @@ class Task:
     db: TinyDB = None
 
     def write_to_db(self):
-        self.id = self.db.insert({ 'title': self.title,
+        self.id = self.db.insert({ 
+                    'title': self.title,
                     'content': self.content,
                     'time_expired': self.time_expired,
                     'time_created': self.time_created,
@@ -44,7 +46,8 @@ class Task:
                     })
     
     def update_in_db(self):
-        self.db.update({ 'title': self.title,
+        self.db.update({ 
+                    'title': self.title,
                     'content': self.content,
                     'time_expired': self.time_expired,
                     'time_created': self.time_created,
@@ -106,6 +109,13 @@ def register_user(user, passwd):
     else:
         raise ValueError("Database error! Contact administrator.")
 
+
+def search_tasks(db, tasks, searched_word):
+    searched_word = searched_word.lower()
+    for task in get_tasks(db, tasks):
+        if (searched_word in task.title.lower() 
+            or searched_word in task.content.lower()):
+            yield task
 
 # some commands for test
 # db_users.insert({'name': 'USER_NAME', 'password': get_hashed_password("XXXXX")})
