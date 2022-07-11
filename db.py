@@ -88,6 +88,14 @@ def get_tasks(db, tasks):
     for el in sorted(result, key=lambda k: k['time_created'], reverse=True):
         yield create_task_class(el)
 
+
+def search_tasks(db, tasks, searched_word):
+    searched_word = searched_word.lower()
+    for task in get_tasks(db, tasks):
+        if (searched_word in task.title.lower() 
+            or searched_word in task.content.lower()):
+            yield task
+
 # user, pasword and hash helpers
 def get_hashed_password(plain_text_password):
     # Hash a password for the first time
@@ -109,13 +117,6 @@ def register_user(user, passwd):
     else:
         raise ValueError("Database error! Contact administrator.")
 
-
-def search_tasks(db, tasks, searched_word):
-    searched_word = searched_word.lower()
-    for task in get_tasks(db, tasks):
-        if (searched_word in task.title.lower() 
-            or searched_word in task.content.lower()):
-            yield task
 
 # some commands for test
 # db_users.insert({'name': 'USER_NAME', 'password': get_hashed_password("XXXXX")})
