@@ -39,5 +39,5 @@ deso3:heslo
 ```
 
 
-What is missing for now:
-- tests (I am working on them)
+What is not completed for now:
+- tests (I am working on them, some of them are ready in test folder)
