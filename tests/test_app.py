@@ -51,13 +51,19 @@ def client():
     return testing.TestClient(app)
 
 
-def test_index_without_login(client):
+def test_index_status_without_login(client):
     """Test that index have to redirect to login page withou proper authorization"""
     response = client.simulate_get('/')
     assert response.status == falcon.HTTP_303
 
 
-def test_index_with_login(client, fake_db, monkeypatch):
+def test_index_status_with_login(client, fake_db, monkeypatch):
+    monkeypatch.setattr(login, "db_init", fake_db.fake_db_init)
+    monkeypatch.setattr(login, "db_users", fake_db.db_users)
+    response = client.simulate_get('/', cookies={"user": "test", 'cookie_uuid': fake_db.test_cookie})
+    assert response.status == falcon.HTTP_OK
+
+def test_index_with_default_view(client, fake_db, monkeypatch):
     monkeypatch.setattr(login, "db_init", fake_db.fake_db_init)
     monkeypatch.setattr(login, "db_users", fake_db.db_users)
     response = client.simulate_get('/', cookies={"user": "test", 'cookie_uuid': fake_db.test_cookie})
@@ -65,4 +71,3 @@ def test_index_with_login(client, fake_db, monkeypatch):
     tasks = db.get_tasks(fake_db.main_fake_db, None)
     rendered_template = mytemplate.render(data={"tasks": tasks, "tasks_type": None})
     assert rendered_template == response.content
-    assert response.status == falcon.HTTP_OK
