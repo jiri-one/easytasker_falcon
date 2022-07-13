@@ -76,8 +76,11 @@ class LoginResource(object):
     
     @falcon.after(render_template, "register.mako")
     def on_post_register(self, req, resp):
-        login = req.get_param("login")
-        passwd = req.get_param("password")
+        form_data = {}
+        for part in req.media:
+            form_data[part.name] = part.data.decode()
+        login = form_data["login"]
+        passwd = form_data["password"]
         try:
             new_user_id = register_user(login, passwd)
             mkdir(cwd / f"files/{login}")

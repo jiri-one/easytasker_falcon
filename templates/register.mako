@@ -4,7 +4,7 @@
     <center>
 <div class="comment_title"><b>Registrace nového uživatele:</b></div>
 <div class="comment_form">
-<form method="post" action="" accept-charset="UTF-8">
+<form method="post" action="" accept-charset="UTF-8" enctype="multipart/form-data">
 	<label for="login">Uživatelské jméno:</label><br>
 	<input type="text" name="login" placeholder="Login name"><br>
 	<label for="password">Heslo:</label><br>
