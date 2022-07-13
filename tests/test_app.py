@@ -72,13 +72,27 @@ def test_index_status_without_login(client):
     assert response.status == falcon.HTTP_303
 
 
-def test_index_status_with_login(client, fake_db, monkeypatch):
+def test_index_status_with_login(client, fake_db):
     response = client.simulate_get('/', cookies={"user": "test", 'cookie_uuid': fake_db.test_cookie})
     assert response.status == falcon.HTTP_OK
 
-def test_index_with_default_view(client, fake_db, monkeypatch):
-    response = client.simulate_get('/', cookies={"user": "test", 'cookie_uuid': fake_db.test_cookie})
+def test_index_with_all_task_types(client, fake_db):
     mytemplate = templatelookup.get_template("index.mako")
-    tasks = db.get_tasks(fake_db.main_fake_db, None)
-    rendered_template = mytemplate.render(data={"tasks": tasks, "tasks_type": None})
-    assert rendered_template == response.content
+    for task_type in [None, "finished", "expired"]:
+        tasks = db.get_tasks(fake_db.main_fake_db, task_type)
+        rendered_template = mytemplate.render(data={"tasks": tasks, "tasks_type": task_type})
+        response = client.simulate_get(f'/?tasks={task_type}', cookies={"user": "test", 'cookie_uuid': fake_db.test_cookie})
+        assert rendered_template == response.content
+        assert response.status == falcon.HTTP_OK
+
+# this is preparation for test, where I would like to test rest of GET methods, except of index
+def test_all_routes(client, fake_db):
+    for route in inspect.inspect_routes(app):
+        for method in route.methods:
+            if method.function_name[:2] == "on" and method.suffix:
+                print(route.path, method.method, method.function_name, method.suffix)
+    # response = client.simulate_get('/', cookies={"user": "test", 'cookie_uuid': fake_db.test_cookie})
+    # mytemplate = templatelookup.get_template("index.mako")
+    # tasks = db.get_tasks(fake_db.main_fake_db, None)
+    # rendered_template = mytemplate.render(data={"tasks": tasks, "tasks_type": None})
+    # assert rendered_template == response.content
