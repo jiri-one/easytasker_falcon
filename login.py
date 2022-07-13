@@ -14,8 +14,7 @@ class Authorize(object):
         if req.get_cookie_values('cookie_uuid') and req.get_cookie_values('user'):
             cookie_uuid = req.get_cookie_values('cookie_uuid')[0]
             user = req.get_cookie_values('user')[0]
-            cookie_from_db = db_users.search(query.name == user)[
-                0]["cookie_uuid"]
+            cookie_from_db = db_users.search(query.name == user)[0]["cookie_uuid"]
             if cookie_uuid == cookie_from_db:
                 resp.context.authorized = 1
                 resource.user = user

@@ -8,7 +8,7 @@ from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization.serializers import DateTimeSerializer
 # internal imports
 from easytasker import app
-import db
+import db, login
 from path_serializer import PathSerializer
 
 serialization = SerializationMiddleware(JSONStorage)
@@ -27,7 +27,9 @@ class FakeDB(object):
                               'cookie_uuid': self.test_cookie})
 
     def fake_db_init(self, user):
-        return TinyDB(self.tmp_path / 'files/test/db.json', storage=serialization)
+        main_fake_db = TinyDB(self.tmp_path / 'files/test/db.json', storage=serialization)
+
+        return main_fake_db
 
 
 @pytest.fixture
@@ -46,7 +48,7 @@ def test_index_without_login(client):
 
 
 def test_index_with_login(client, fake_db, monkeypatch):
-    monkeypatch.setattr(db, "db_init", fake_db.fake_db_init)
-    monkeypatch.setattr(db, "db_users", fake_db.db_users)
+    monkeypatch.setattr(login, "db_init", fake_db.fake_db_init)
+    monkeypatch.setattr(login, "db_users", fake_db.db_users)
     response = client.simulate_get('/', cookies={"user": "test", 'cookie_uuid': fake_db.test_cookie})
     assert response.status == falcon.HTTP_OK
