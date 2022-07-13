@@ -2,12 +2,10 @@ import falcon
 from falcon import testing, inspect
 import pytest
 from uuid import uuid4
-from pathlib import Path
-from tinydb import TinyDB, Query, JSONStorage
+from tinydb import TinyDB, JSONStorage
 from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization.serializers import DateTimeSerializer
 from datetime import datetime, timedelta
-from mako.lookup import TemplateLookup
 # internal imports
 from easytasker import app
 import db, login
