@@ -73,7 +73,7 @@ def client(fake_db, monkeypatch):
 
 
 def test_all_GET_to_status_303_without_logged_user(client):
-    """All GET methods have to redirect (status 303) to /login page, so except /login and /register"""
+    """All GET methods have to redirect (status 303) to /login page (except /login and /register page), if user is not logged in."""
     for route in inspect.inspect_routes(app):
        for method in route.methods:
             if method.function_name[:6] == "on_get" and route.path not in ["/login", "/register"]:
@@ -83,7 +83,7 @@ def test_all_GET_to_status_303_without_logged_user(client):
 
 
 def test_all_GET_status_200_with_logged_user(client, fake_db):
-    """All pages and their GET methods have to return code 200 OK, except /login and /logout page"""
+    """All pages and their GET methods have to return code 200 OK (except /login and /logout page) if user is logged in."""
     for route in inspect.inspect_routes(app):
        for method in route.methods:
             if method.function_name[:6] == "on_get" and route.path not in ["/login", "/logout"]:
@@ -94,7 +94,7 @@ def test_all_GET_status_200_with_logged_user(client, fake_db):
 
 def test_index_with_all_task_types(client, fake_db):
     mytemplate = templatelookup.get_template("index.mako")
-    for task_type in [None, "finished", "expired"]:
+    for task_type in [None, "finished", "expired"]: # None is default view for active tasks
         tasks = db.get_tasks(fake_db.main_fake_db, task_type)
         rendered_template = mytemplate.render(data={"tasks": tasks, "tasks_type": task_type})
         response = client.simulate_get(f'/?tasks={task_type}', cookies={"user": "test", 'cookie_uuid': fake_db.test_cookie})
