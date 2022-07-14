@@ -40,7 +40,11 @@ class TaskerResource(object):
 
     @falcon.after(render_template, "task.mako")
     def on_get_task(self, req, resp, task_id):
-        resp.text = get_task_from_db(self.db, task_id)
+        task = get_task_from_db(self.db, task_id)
+        if task:
+            resp.text = task
+        else:
+            raise falcon.HTTPBadRequest(title="Neexsitující ID tasku, používejte pouze tlačítka a odkazy na stránce!")
     
     
     def on_post_task(self, req, resp, task_id):
@@ -50,8 +54,7 @@ class TaskerResource(object):
                 if part.split("_")[0] != "delete" or doc_id != task_id:
                     raise ValueError
             except ValueError:
-                falcon.HTTPBadRequest(
-                    "Používejte pouze tlačítka a odkazy na stránce!")
+                falcon.HTTPBadRequest(title="Používejte pouze tlačítka a odkazy na stránce!")
         remove_task_from_db(self.db, doc_id)
         raise falcon.HTTPSeeOther("/")
 
