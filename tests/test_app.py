@@ -71,7 +71,7 @@ def client(fake_db, monkeypatch):
     monkeypatch.setattr(login, "db_users", fake_db.db_users)
     return testing.TestClient(app)
 
-
+# TESTS FOR GET METHODS
 def test_all_GET_to_status_303_without_logged_user(client):
     """All GET methods have to redirect (status 303) to /login page (except /login and /register page), if user is not logged in."""
     for route in inspect.inspect_routes(app):
@@ -125,3 +125,12 @@ def test_task_page_with_three_testing_tasks(client, fake_db):
         response = client.simulate_get(f'/{task_from_db.id}', cookies={"user": "test", 'cookie_uuid': fake_db.test_cookie})
         assert rendered_template == response.content
         assert response.status == falcon.HTTP_OK
+
+def test_task_page_bad_task_number(client, fake_db):
+    response = client.simulate_get('/999999', cookies={"user": "test", 'cookie_uuid': fake_db.test_cookie})
+    assert response.json == {"title": "Neexistující ID tasku, používejte pouze tlačítka a odkazy na stránce!"}
+
+def test_task_page_task_number_is_not_int(client, fake_db):
+    response = client.simulate_get('/XXXX', cookies={"user": "test", 'cookie_uuid': fake_db.test_cookie})
+    assert response.status == falcon.HTTP_404
+    # in the future, this should be handled better

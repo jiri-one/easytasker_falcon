@@ -44,7 +44,7 @@ class TaskerResource(object):
         if task:
             resp.text = task
         else:
-            raise falcon.HTTPBadRequest(title="Neexsitující ID tasku, používejte pouze tlačítka a odkazy na stránce!")
+            raise falcon.HTTPBadRequest(title="Neexistující ID tasku, používejte pouze tlačítka a odkazy na stránce!")
     
     
     def on_post_task(self, req, resp, task_id):
