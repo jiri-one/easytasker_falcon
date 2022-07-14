@@ -1,5 +1,5 @@
-﻿#EasyTasker
-##Simple web based tasker.
+﻿**EasyTasker
+Simple web based tasker.**
 
 **Instalation:**
 After download files from this repository, you can install and run it this way:
