@@ -1,5 +1,7 @@
-﻿**This is simple web based tasker named shortly EasyTasker.**
+﻿###EasyTasker
+####Simple web based tasker.
 
+**Instalation:**
 After download files from this repository, you can install and run it this way:
 ```shell
 python -m venv venv
@@ -8,7 +10,7 @@ pip install -r requirements.txt
 python easytasker.py
 ```
 
-Features of EasyTasker:
+**Features of EasyTasker:**
 - user registration
 - user login/logout
 - NoSQL database backend
@@ -18,18 +20,19 @@ Features of EasyTasker:
 - you can see expired tasks
 - and some more functions ...
 
-EasyTasker is based on:
+**EasyTasker is based on:**
 - Falcon
 - TinyDB
 - BCrypt
 - Mako
 
-For default local run:
+**Dependencies for default local run:**
 - hupper
 - waitress
 
 Every dependencies are included in requirements.txt. If you want to use another server and you don't need reloader, then you can uninstall or don't need to install hupper and waitress.
 
+**Login:**
 Three accounts are created for preview and tests, so you can use them:
 
 ```
@@ -37,7 +40,10 @@ deso:heslo
 deso2:heslo
 deso3:heslo
 ```
+But you can (and you should) register your own account.
 
-
-What is not completed for now:
-- tests (I am working on them, some of them are ready in test folder)
+**Tests:**
+- NOT FINISHED YET
+- created in pytest (install it with `pip install pytest`)
+- helpers for pytest are flacon.inspect and flacon.testing
+- tests are completely independent on main db or user_db
