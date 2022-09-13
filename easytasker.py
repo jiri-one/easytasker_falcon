@@ -1,14 +1,10 @@
 from multiprocessing.sharedctypes import Value
 import falcon
 from datetime import datetime
-from locale import setlocale, LC_TIME
 # internal imports
 from helpers import render_template
 from login import LoginResource, Authorize
 from db import cwd, get_tasks, get_task_from_db, remove_task_from_db, search_tasks, Task
-
-# set global local to czech version of time (I am using english everywhere ...)
-setlocale(LC_TIME, "cs_CZ.utf8")
 
 
 @falcon.before(Authorize())
