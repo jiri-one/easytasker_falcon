@@ -45,5 +45,5 @@ But you can (and you should) register your own account.
 - [![Tests (PyTest)](https://github.com/jiri-one/easytasker_falcon/actions/workflows/tests.yml/badge.svg)](https://github.com/jiri-one/easytasker_falcon/actions/workflows/tests.yml)
 - created in pytest (install it with `pip install pytest`)
 - helpers for pytest are flacon.inspect and flacon.testing
-- tests are completely independent on main db or user_db
+- tests are completely independent of main db or user db
 - NOT FINISHED YET (more test will come later)
