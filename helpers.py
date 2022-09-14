@@ -20,7 +20,7 @@ templatelookup = TemplateLookup(directories=['templates'],
 def format_dt(dt: datetime):
     months = ('ledna', 'února', 'března', 'dubna', 'května', 'června', 'července', 'srpna', 'září', 'října', 'listopadu', 'prosince')
     days = ('Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota', 'Neděle')
-    return f"{days[dt.weekday()]} {dt.day}. {months[dt.month]}, {dt.strftime('%H:%M:%S')}"
+    return f"{days[dt.weekday()]} {dt.day}. {months[dt.month-1]}, {dt.strftime('%H:%M:%S')}"
     
 def render_template(req, resp, resource, template):
 	"""@falcon.after decorator for Mako templates - works on GET and POST methodes"""
