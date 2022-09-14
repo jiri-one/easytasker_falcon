@@ -20,16 +20,16 @@ python easytasker.py
 - and some more functions ...
 
 **EasyTasker is based on:**
-- Falcon
-- TinyDB
-- BCrypt
-- Mako
+- [Falcon](https://falcon.readthedocs.io/en/stable/) (WSGI framework)
+- [TinyDB](https://tinydb.readthedocs.io/en/latest/index.html) (pure Python NoSQL database)
+- [BCrypt](https://github.com/pyca/bcrypt/) (password hashing tool and crypto algorithm)
+- [Mako](https://www.makotemplates.org/) (fast html template system for Python)
 
 **Dependencies for default local run:**
-- hupper
-- waitress
+- [hupper](https://github.com/Pylons/hupper)
+- [waitress](https://github.com/Pylons/waitress)
 
-Every dependencies are included in requirements.txt. If you want to use another server and you don't need reloader, then you can uninstall or don't need to install hupper and waitress.
+Every dependencies are included in requirements.txt. If you want to use another server and you don't need reloader, then you can uninstall or don't need to install hupper and waitress (in this case you will need to change local_run() function in [easytasker.py](https://github.com/jiri-one/easytasker_falcon/blob/main/easytasker.py) file maybe, for local development/run).
 
 **Login:**
 Three accounts are created for preview and tests, so you can use them:
